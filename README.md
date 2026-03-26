@@ -8,10 +8,20 @@
 | 模块 | 功能说明 |
 |------|---------|
 | **工作台** | 数据统计概览、待办任务、最近公司资料 |
-| **公司资料** | 公司信息CRUD、营业执照状态跟踪、银行公户状态跟踪 |
+| **公司资料** | 公司信息CRUD（外国人资料：FirstName/LastName/SSN/DOB等）、营业执照状态、银行公户状态 |
+| **银行资料** | 一对多银行账户管理（Routing/Account Number、网银登录、安全密钥、附件上传） |
 | **任务管理** | 创建/分配/流转任务、关联公司、任务日志追踪 |
 | **文件管理** | 上传/下载/分类管理文件（身份证、营业执照、银行资料、合同等） |
+| **电话库** | 电话号码录入/批量导入、员工领用（关联公司+银行标签）、释放回收 |
+| **邮箱库** | 邮箱录入/批量导入（邮箱----密码）、员工领用（关联公司+银行标签）、释放回收 |
 | **员工管理** | 用户管理、角色权限（管理员/主管/员工） |
+
+### 电话库 / 邮箱库规则
+- 每个号码/邮箱**唯一**，不可重复录入
+- 同一号码/邮箱**只能被一个员工领用**
+- 领用时必须**关联公司 + 填写银行标签**，可选关联具体银行账户
+- 兼容一个公司下的多家银行资料
+- 已领用的资源不可删除，需管理员先释放
 
 ### 任务流转
 ```
@@ -46,11 +56,14 @@ company_sys/
 │   │   ├── models/
 │   │   │   └── models.py   # SQLAlchemy数据表模型
 │   │   └── routers/        # API路由
-│   │       ├── auth.py     # 认证接口
-│   │       ├── users.py    # 员工管理
-│   │       ├── companies.py# 公司资料
-│   │       ├── tasks.py    # 任务管理
-│   │       └── documents.py# 文件管理
+│   │       ├── auth.py         # 认证接口
+│   │       ├── users.py        # 员工管理
+│   │       ├── companies.py    # 公司资料
+│   │       ├── bank_accounts.py# 银行资料
+│   │       ├── tasks.py        # 任务管理
+│   │       ├── documents.py    # 文件管理
+│   │       ├── phone_pool.py   # 电话库
+│   │       └── email_pool.py   # 邮箱库
 │   ├── requirements.txt
 │   └── .env.example
 └── frontend/                # Vue3前端
@@ -62,12 +75,14 @@ company_sys/
     │   ├── utils/          # API封装
     │   ├── layout/         # 布局组件
     │   └── views/          # 页面
-    │       ├── Login.vue
-    │       ├── Dashboard.vue
-    │       ├── Companies.vue
-    │       ├── Tasks.vue
-    │       ├── Documents.vue
-    │       └── Users.vue
+    │       ├── Login.vue       # 登录
+    │       ├── Dashboard.vue   # 工作台
+    │       ├── Companies.vue   # 公司资料(含银行资料Tab)
+    │       ├── Tasks.vue       # 任务管理
+    │       ├── Documents.vue   # 文件管理
+    │       ├── PhonePool.vue   # 电话库
+    │       ├── EmailPool.vue   # 邮箱库
+    │       └── Users.vue       # 员工管理
     ├── package.json
     └── vite.config.js
 ```
