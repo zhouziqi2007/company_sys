@@ -363,3 +363,49 @@ class EmailAccountOut(BaseModel):
 
 class EmailAccountRelease(BaseModel):
     pass
+
+
+# ========== Product ==========
+class ProductBarcodeItem(BaseModel):
+    barcode: str
+    label: Optional[str] = ""
+
+
+class ProductCreate(BaseModel):
+    name: str
+    description: Optional[str] = ""
+    company_id: Optional[int] = None
+    remark: Optional[str] = ""
+    barcodes: List[ProductBarcodeItem] = []
+
+
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    company_id: Optional[int] = None
+    remark: Optional[str] = None
+    barcodes: Optional[List[ProductBarcodeItem]] = None
+
+
+class ProductBarcodeOut(BaseModel):
+    id: int
+    barcode: str
+    label: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ProductOut(BaseModel):
+    id: int
+    name: str
+    description: str
+    company_id: Optional[int] = None
+    company_name: Optional[str] = ""
+    remark: str
+    barcodes: List[ProductBarcodeOut] = []
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

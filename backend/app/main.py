@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 from app.database import engine, Base
-from app.models.models import User, Company, Task, TaskLog, Document, BankAccount, PhoneNumber, EmailAccount
-from app.routers import auth, users, companies, tasks, documents, bank_accounts, phone_pool, email_pool
+from app.models.models import User, Company, Task, TaskLog, Document, BankAccount, PhoneNumber, EmailAccount, Product, ProductBarcode
+from app.routers import auth, users, companies, tasks, documents, bank_accounts, phone_pool, email_pool, products
 from app.auth import hash_password
 
 app = FastAPI(title="任务分发及资料管理系统", version="1.0.0")
@@ -32,6 +32,7 @@ app.include_router(documents.router)
 app.include_router(bank_accounts.router)
 app.include_router(phone_pool.router)
 app.include_router(email_pool.router)
+app.include_router(products.router)
 
 
 @app.on_event("startup")

@@ -17,6 +17,7 @@ const routes = [
       { path: 'documents', name: 'Documents', component: () => import('../views/Documents.vue'), meta: { title: '文件管理' } },
       { path: 'phone-pool', name: 'PhonePool', component: () => import('../views/PhonePool.vue'), meta: { title: '电话库' } },
       { path: 'email-pool', name: 'EmailPool', component: () => import('../views/EmailPool.vue'), meta: { title: '邮箱库' } },
+      { path: 'products', name: 'Products', component: () => import('../views/Products.vue'), meta: { title: '产品条码' } },
       { path: 'users', name: 'Users', component: () => import('../views/Users.vue'), meta: { title: '员工管理' } },
     ],
   },
