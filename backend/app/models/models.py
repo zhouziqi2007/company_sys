@@ -76,6 +76,7 @@ class Company(Base):
     bank_accounts = relationship("BankAccount", back_populates="company", order_by="BankAccount.created_at.desc()")
     phone_numbers = relationship("PhoneNumber", back_populates="company")
     email_accounts = relationship("EmailAccount", back_populates="company")
+    products = relationship("Product", back_populates="company")
 
 
 class Task(Base):
@@ -222,6 +223,38 @@ class PhoneNumber(Base):
     claimer = relationship("User", foreign_keys=[claimed_by])
     company = relationship("Company", back_populates="phone_numbers")
     bank_account = relationship("BankAccount", back_populates="phone_numbers")
+
+
+class Product(Base):
+    """产品表"""
+    __tablename__ = "products"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(200), nullable=False, index=True, comment="产品名称")
+    description = Column(Text, default="", comment="产品描述")
+    company_id = Column(Integer, ForeignKey("companies.id"), nullable=True, comment="所属公司")
+    remark = Column(Text, default="", comment="备注")
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+    # 关系
+    company = relationship("Company", back_populates="products")
+    barcodes = relationship("ProductBarcode", back_populates="product", cascade="all, delete-orphan",
+                            order_by="ProductBarcode.created_at")
+
+
+class ProductBarcode(Base):
+    """产品条码表 - 一个产品可以有多个条码"""
+    __tablename__ = "product_barcodes"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False, index=True)
+    barcode = Column(String(200), unique=True, nullable=False, index=True, comment="条码值")
+    label = Column(String(50), default="", comment="条码标签: UPC/EAN/SKU/自定义等")
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    product = relationship("Product", back_populates="barcodes")
 
 
 class EmailAccount(Base):

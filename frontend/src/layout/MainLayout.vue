@@ -37,6 +37,10 @@
           <el-icon><Message /></el-icon>
           <template #title>邮箱库</template>
         </el-menu-item>
+        <el-menu-item index="/products">
+          <el-icon><Grid /></el-icon>
+          <template #title>产品条码</template>
+        </el-menu-item>
         <el-menu-item v-if="userStore.isAdmin" index="/users">
           <el-icon><User /></el-icon>
           <template #title>员工管理</template>
