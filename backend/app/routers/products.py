@@ -1,6 +1,6 @@
 """产品及条码管理"""
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import or_
 from app.database import get_db
 from app.auth import get_current_user, require_role
@@ -42,7 +42,7 @@ def list_products(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    q = db.query(Product).options(joinedload(Product.barcodes), joinedload(Product.company))
+    q = db.query(Product).options(selectinload(Product.barcodes), selectinload(Product.company))
     if keyword:
         # 同时搜索产品名称和条码
         barcode_product_ids = (
@@ -66,15 +66,8 @@ def list_products(
         .limit(page_size)
         .all()
     )
-    # deduplicate due to joinedload
-    seen = set()
-    unique_items = []
-    for item in items:
-        if item.id not in seen:
-            seen.add(item.id)
-            unique_items.append(item)
     return {
-        "items": [_to_out(i) for i in unique_items],
+        "items": [_to_out(i) for i in items],
         "total": total,
         "page": page,
         "page_size": page_size,
@@ -97,7 +90,7 @@ def scan_barcode(
         raise HTTPException(404, "未找到该条码对应的产品")
     product = (
         db.query(Product)
-        .options(joinedload(Product.barcodes), joinedload(Product.company))
+        .options(selectinload(Product.barcodes), selectinload(Product.company))
         .filter(Product.id == bc.product_id)
         .first()
     )
@@ -140,7 +133,7 @@ def create_product(
     # reload with relationships
     product = (
         db.query(Product)
-        .options(joinedload(Product.barcodes), joinedload(Product.company))
+        .options(selectinload(Product.barcodes), selectinload(Product.company))
         .filter(Product.id == product.id)
         .first()
     )
@@ -155,7 +148,7 @@ def get_product(
 ):
     product = (
         db.query(Product)
-        .options(joinedload(Product.barcodes), joinedload(Product.company))
+        .options(selectinload(Product.barcodes), selectinload(Product.company))
         .filter(Product.id == product_id)
         .first()
     )
@@ -188,7 +181,6 @@ def update_product(
         product.remark = data.remark
     # 更新条码列表：全量替换
     if data.barcodes is not None:
-        new_barcode_values = {bc.barcode for bc in data.barcodes}
         # 检查新条码是否被其他产品占用
         for bc_item in data.barcodes:
             existing = (
@@ -215,7 +207,7 @@ def update_product(
     # reload
     product = (
         db.query(Product)
-        .options(joinedload(Product.barcodes), joinedload(Product.company))
+        .options(selectinload(Product.barcodes), selectinload(Product.company))
         .filter(Product.id == product_id)
         .first()
     )
